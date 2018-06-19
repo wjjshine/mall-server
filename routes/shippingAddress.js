@@ -7,10 +7,9 @@ router.get('/list/:id',(req,res)=>{
   const userId = req.params.id;
   ShippingAddress.find({ofUser: userId}).populate({path: 'shippingAddress'}).sort({'set':-1}).exec((err, shippingAddress) => {
     if (err) {
-      res.statusCode = 400;
-      res.json({desc: err.message});
+      res.status(400).json({desc: err.message});
     } else {
-      res.json({desc: 'success', list: shippingAddress});
+      res.json({count:shippingAddress.length, list: shippingAddress});
     }
   })
 })
@@ -27,9 +26,9 @@ router.post('/add', async (req,res)=>{
     _user.save();
     _address.save((err)=>{
       if(err) {
-        res.status(400).json({desc: 'add fail'})
+        res.status(400).json({desc: '新增失败'})
       }else{
-        res.json({ desc: 'add success' ,data:_address})
+        res.json({ desc: '新增成功' ,data:_address})
       }
     })
   } catch(err){
@@ -50,7 +49,7 @@ router.put('/update', async (req,res)=>{
       preAddress: req.body.preAddress,
     })
     _address.save(err=>{
-      err ? res.json({code: 403, desc: 'update fail'}) :  res.json({code: 200, desc: 'update success'})
+      err ? res.status(400).json({ desc: '更新失败'}) :  res.json({ desc: '更新成功' })
     })
 
   }catch (err){
@@ -72,10 +71,9 @@ router.delete('/delete/:userId/:addressId',async (req,res)=>{
       if(err) console.log(err)
       ShippingAddress.remove({_id:addressId}, err=>{
         if(err){
-          res.statusCode = 400;
-          res.json({ desc: '删除失败'})
+          res.status(400).json({ desc: '删除失败'})
         }else{
-          res.json({ desc: 'successful'})
+          res.json({ desc: '删除成功'})
         }
       })
     })
